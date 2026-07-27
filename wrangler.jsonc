@@ -61,9 +61,9 @@
   // Cron trigger — primes the warm pool so the alarm loop starts on deploy.
   // Runs every minute by default. Remove or adjust if you only want manual
   // priming via POST /pool/prime.
-  "triggers": {
-    "crons": ["* * * * *"]
-  },
+  // "triggers": {
+  //   "crons": ["* * * * *"]
+  // },
   // Secrets — set via `wrangler secret put SANDBOX_API_KEY` before deploying.
   // The Python client must send this value as: Authorization: Bearer <token>
   // Declared here so wrangler generates the Env type; override in .dev.vars for local dev.
@@ -85,5 +85,9 @@
     // cold-start stampede. Clamped to [1, 20]. Default 5.
     "WARM_POOL_SCALE_BATCH_SIZE": "5"
   },
-  "preview_urls": false
+  "preview_urls": false,
+  "route": {
+    "custom_domain": true,
+    "pattern": "sandbox.5starsolutions.co"
+  }
 }
