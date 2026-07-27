@@ -27,8 +27,8 @@
       "image": "./Dockerfile",
       // "standard-1" (4 vCPU / 8 GiB RAM) suits production workloads; drop to
       // "lite" to minimise cost when getting started.
-      "instance_type": "standard-1",
-      "max_instances": 3
+      "instance_type": "lite",
+      "max_instances": 10
     }
   ],
   "durable_objects": {
