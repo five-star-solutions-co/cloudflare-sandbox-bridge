@@ -1,7 +1,7 @@
 {
 	"$schema": "./node_modules/oxfmt/configuration_schema.json",
 	"arrowParens": "always",
-	"ignorePatterns": ["**/*.md", "**/.wrangler/**", "worker-configuration.d.ts"],
+	"ignorePatterns": ["**/*.md", "**/.wrangler/**", "worker-configuration.d.ts", "wrangler.jsonc"],
 	"semi": false,
 	"singleQuote": true,
 	"tabWidth": 2,

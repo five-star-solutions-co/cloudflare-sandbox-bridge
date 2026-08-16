@@ -16,7 +16,6 @@ pre-commit:
         - '*.cts'
         - '*.js'
         - '*.json'
-        - '*.jsonc'
         - '*.jsx'
         - '*.mjs'
         - '*.mts'
