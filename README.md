@@ -31,6 +31,17 @@ When running locally, a few routes make it easy to explore the API:
 
 ## Deployment
 
+Production and development share this repository, but not one deployed Worker. Each deployment has its own bearer
+token, Durable Object namespace, containers, capacity, and custom domain:
+
+| Environment | Worker | Domain |
+| --- | --- | --- |
+| Production | `cloudflare-sandbox-bridge` | `sandbox.5starsolutions.co` |
+| Development | `cloudflare-sandbox-bridge-development` | `sandbox.fivestardev.co` |
+
+Keep `SANDBOX_API_KEY` different in each environment. Sharing one deployed Worker would let a development credential
+operate production sandbox IDs and would combine both environments under the same container limit and warm pool.
+
 The fastest way to deploy is the **Deploy to Cloudflare** button above. It clones this directory into your GitHub account, provisions the Durable Objects and container resources, and deploys via Workers Builds.
 
 To deploy manually:
@@ -40,6 +51,13 @@ npm ci
 npx wrangler login
 npx wrangler secret put SANDBOX_API_KEY    # paste a token from: openssl rand -hex 32
 npx wrangler deploy
+```
+
+Configure and deploy development separately:
+
+```sh
+npx wrangler secret put SANDBOX_API_KEY --env development
+npx wrangler deploy --env development
 ```
 
 Verify the deployment:
