@@ -2,3 +2,4 @@
 examples/vendor/
 .idea
 .vscode
+node_modules

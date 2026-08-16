@@ -24,18 +24,5 @@
     "typescript": "^5.9.3",
     "vitest": "^4.1.8",
     "wrangler": "^4.102.0"
-  },
-  "cloudflare": {
-    "bindings": {
-      "SANDBOX_API_KEY": {
-        "description": "Bearer token for API authentication. Generate with `openssl rand -hex 32`."
-      },
-      "WARM_POOL_TARGET": {
-        "description": "Number of pre-warmed containers to keep ready (0 disables the warm pool)."
-      },
-      "WARM_POOL_REFRESH_INTERVAL": {
-        "description": "Milliseconds between warm pool health checks (default: 10000)."
-      }
-    }
   }
 }

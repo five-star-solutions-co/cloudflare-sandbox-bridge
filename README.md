@@ -2,8 +2,6 @@
 
 Cloudflare Worker (TypeScript + [Hono](https://hono.dev/)) that exposes the sandbox HTTP API. Creates and manages sandboxed execution environments backed by [Cloudflare Containers](https://developers.cloudflare.com/containers/).
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/sandbox-sdk/tree/main/bridge/worker)
-
 ## Prerequisites
 
 - Node.js and npm
@@ -42,33 +40,36 @@ token, Durable Object namespace, containers, capacity, and custom domain:
 Keep `SANDBOX_API_KEY` different in each environment. Sharing one deployed Worker would let a development credential
 operate production sandbox IDs and would combine both environments under the same container limit and warm pool.
 
-The fastest way to deploy is the **Deploy to Cloudflare** button above. It clones this directory into your GitHub account, provisions the Durable Objects and container resources, and deploys via Workers Builds.
+GitHub Actions deploys development from pushes to `main`. Workflow dispatch can deploy development, production, or
+both. Configure the repository secret `CLOUDFLARE_API_TOKEN` before running it.
 
 To deploy manually:
 
 ```sh
 npm ci
 npx wrangler login
-npx wrangler secret put SANDBOX_API_KEY    # paste a token from: openssl rand -hex 32
-npx wrangler deploy
+npx wrangler deploy --env production
+npx wrangler secret put SANDBOX_API_KEY --env production
 ```
 
 Configure and deploy development separately:
 
 ```sh
-npx wrangler secret put SANDBOX_API_KEY --env development
 npx wrangler deploy --env development
+npx wrangler secret put SANDBOX_API_KEY --env development
 ```
 
 Verify the deployment:
 
 ```sh
-curl https://<your-worker>.workers.dev/health
+curl https://sandbox.5starsolutions.co/health
+curl https://sandbox.fivestardev.co/health
 ```
 
 ### Container instance type
 
-The default configuration uses `"lite"` instances with `max_instances: 3`. This is a good starting point for development and light usage. For production workloads that need more CPU or memory, change `instance_type` to `"standard-1"` (4 vCPU / 8 GiB RAM) and increase `max_instances` in `wrangler.jsonc`.
+Development uses three `"lite"` instances and production uses ten. For production workloads that need more CPU or
+memory, change its `instance_type` to `"standard-1"` (4 vCPU / 8 GiB RAM).
 
 ## Updating
 
@@ -82,7 +83,7 @@ Both versions should match — the SDK and container image are released together
 ```sh
 npm install
 npm run dev          # verify locally
-npx wrangler deploy  # deploy the update
+npx wrangler deploy --env production  # deploy the update
 ```
 
 ## Authentication
@@ -96,7 +97,8 @@ Authorization: Bearer <SANDBOX_API_KEY>
 If `SANDBOX_API_KEY` is not configured on the worker, auth is skipped — convenient for local dev without a `.dev.vars` file. Set the secret before deploying:
 
 ```sh
-wrangler secret put SANDBOX_API_KEY
+wrangler secret put SANDBOX_API_KEY --env development
+wrangler secret put SANDBOX_API_KEY --env production
 ```
 
 ## Sandbox Interface
