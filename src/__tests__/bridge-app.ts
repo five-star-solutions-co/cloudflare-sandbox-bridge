@@ -1,14 +1,27 @@
 /**
- * Test adapter — creates the bridge Hono app for use in tests.
- *
- * This replaces the old `const { app } = await import('../index')` pattern
- * now that the route logic lives in @cloudflare/sandbox/bridge.
+ * Test adapter — Worker fetch wrapper around @cloudflare/sandbox/bridge.
  */
-import { createBridgeApp } from '../../../../packages/sandbox/src/bridge/routes';
+import { bridge } from '@cloudflare/sandbox/bridge'
 
-export const app = createBridgeApp({
-  sandboxBinding: 'Sandbox',
-  warmPoolBinding: 'WarmPool',
-  apiPrefix: '/v1',
-  healthPath: '/health'
-});
+const worker = bridge({})
+
+type WorkerFetch = (request: Request, env: Env, ctx: ExecutionContext) => Response | Promise<Response>
+
+export const app = {
+	request(input: string, init?: RequestInit, env?: Record<string, unknown>) {
+		const fetch = worker.fetch as WorkerFetch | undefined
+		if (!fetch) {
+			throw new Error('bridge() did not return a fetch handler')
+		}
+
+		return fetch(
+			new Request(input, init),
+			env as Env,
+			{
+				waitUntil() {},
+				passThroughOnException() {},
+				props: {}
+			} as ExecutionContext
+		)
+	}
+}

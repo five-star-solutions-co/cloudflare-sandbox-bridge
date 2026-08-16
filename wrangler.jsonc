@@ -1,109 +1,79 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "account_id": "376760229d2c711cee874b9285685496",
-  "name": "cloudflare-sandbox-bridge",
-  "main": "src/index.ts",
-  "compatibility_date": "2025-05-06",
-  "compatibility_flags": ["nodejs_compat"],
-  "observability": {
-    "enabled": true,
-    "traces": {
-      "enabled": true,
-      "head_sampling_rate": 1
-    }
-  },
-  "containers": [
-    {
-      "class_name": "Sandbox",
-      "image": "./Dockerfile",
-      "instance_type": "lite",
-      "max_instances": 10
-    }
-  ],
-  "durable_objects": {
-    "bindings": [
-      { "class_name": "Sandbox", "name": "Sandbox" },
-      { "class_name": "WarmPool", "name": "WarmPool" }
-    ]
-  },
-  "migrations": [
-    { "new_sqlite_classes": ["Sandbox"], "tag": "v1" },
-    { "new_sqlite_classes": ["WarmPool"], "tag": "v2" }
-  ],
-  "vars": {
-    "SANDBOX_TRANSPORT": "rpc",
-    "WARM_POOL_TARGET": "0",
-    "WARM_POOL_REFRESH_INTERVAL": "10000",
-    "WARM_POOL_MAX_INSTANCES": "0",
-    "WARM_POOL_SCALE_BATCH_SIZE": "5"
-  },
-  "secrets": {
-    "required": ["SANDBOX_API_KEY"]
-  },
-  "workers_dev": false,
-  "preview_urls": false,
-  "env": {
-    "development": {
-      "name": "cloudflare-sandbox-bridge-development",
-      "containers": [
-        {
-          "class_name": "Sandbox",
-          "image": "./Dockerfile",
-          "instance_type": "lite",
-          "max_instances": 3
-        }
-      ],
-      "durable_objects": {
-        "bindings": [
-          { "class_name": "Sandbox", "name": "Sandbox" },
-          { "class_name": "WarmPool", "name": "WarmPool" }
-        ]
-      },
-      "vars": {
-        "SANDBOX_TRANSPORT": "rpc",
-        "WARM_POOL_TARGET": "0",
-        "WARM_POOL_REFRESH_INTERVAL": "10000",
-        "WARM_POOL_MAX_INSTANCES": "0",
-        "WARM_POOL_SCALE_BATCH_SIZE": "5"
-      },
-      "secrets": {
-        "required": ["SANDBOX_API_KEY"]
-      },
-      "routes": [
-        { "custom_domain": true, "pattern": "sandbox.fivestardev.co" },
-        { "pattern": "sandbox.fivestardev.co/*", "zone_name": "fivestardev.co" }
-      ]
-    },
-    "production": {
-      "name": "cloudflare-sandbox-bridge-production",
-      "containers": [
-        {
-          "class_name": "Sandbox",
-          "image": "./Dockerfile",
-          "instance_type": "lite",
-          "max_instances": 10
-        }
-      ],
-      "durable_objects": {
-        "bindings": [
-          { "class_name": "Sandbox", "name": "Sandbox" },
-          { "class_name": "WarmPool", "name": "WarmPool" }
-        ]
-      },
-      "vars": {
-        "SANDBOX_TRANSPORT": "rpc",
-        "WARM_POOL_TARGET": "0",
-        "WARM_POOL_REFRESH_INTERVAL": "10000",
-        "WARM_POOL_MAX_INSTANCES": "0",
-        "WARM_POOL_SCALE_BATCH_SIZE": "5"
-      },
-      "secrets": {
-        "required": ["SANDBOX_API_KEY"]
-      },
-      "routes": [
-        { "custom_domain": true, "pattern": "sandbox.5starsolutions.co" },
-        { "pattern": "sandbox.5starsolutions.co/*", "zone_name": "5starsolutions.co" }
-      ]
-    }
-  }
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"account_id": "376760229d2c711cee874b9285685496",
+	"name": "cloudflare-sandbox-bridge",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-05-06",
+	"compatibility_flags": ["nodejs_compat"],
+	"observability": {
+		"enabled": true,
+		"traces": {
+			"enabled": true,
+			"head_sampling_rate": 1
+		}
+	},
+	"containers": [
+		{
+			"class_name": "Sandbox",
+			"image": "./Dockerfile",
+			"instance_type": "lite",
+			"max_instances": 10
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{ "class_name": "Sandbox", "name": "Sandbox" },
+			{ "class_name": "WarmPool", "name": "WarmPool" }
+		]
+	},
+	"migrations": [
+		{ "new_sqlite_classes": ["Sandbox"], "tag": "v1" },
+		{ "new_sqlite_classes": ["WarmPool"], "tag": "v2" }
+	],
+	"workers_dev": false,
+	"preview_urls": false,
+	"env": {
+		"development": {
+			"name": "cloudflare-sandbox-bridge-development",
+			"containers": [
+				{
+					"class_name": "Sandbox",
+					"image": "./Dockerfile",
+					"instance_type": "lite",
+					"max_instances": 3
+				}
+			],
+			"durable_objects": {
+				"bindings": [
+					{ "class_name": "Sandbox", "name": "Sandbox" },
+					{ "class_name": "WarmPool", "name": "WarmPool" }
+				]
+			},
+			"routes": [
+				{ "custom_domain": true, "pattern": "sandbox.fivestardev.co" },
+				{ "pattern": "sandbox.fivestardev.co/*", "zone_name": "fivestardev.co" }
+			]
+		},
+		"production": {
+			"name": "cloudflare-sandbox-bridge-production",
+			"containers": [
+				{
+					"class_name": "Sandbox",
+					"image": "./Dockerfile",
+					"instance_type": "lite",
+					"max_instances": 10
+				}
+			],
+			"durable_objects": {
+				"bindings": [
+					{ "class_name": "Sandbox", "name": "Sandbox" },
+					{ "class_name": "WarmPool", "name": "WarmPool" }
+				]
+			},
+			"routes": [
+				{ "custom_domain": true, "pattern": "sandbox.5starsolutions.co" },
+				{ "pattern": "sandbox.5starsolutions.co/*", "zone_name": "5starsolutions.co" }
+			]
+		}
+	}
 }

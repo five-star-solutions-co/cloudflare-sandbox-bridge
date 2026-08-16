@@ -1,5 +1,24 @@
 # Vendored openai-agents-python-preview — dev-only reference, never committed
 examples/vendor/
-.idea
-.vscode
-node_modules
+
+node_modules/
+dist/
+*.tsbuildinfo
+.envrc
+.env
+.env.*
+!.env.example
+!.env.*.encrypted
+.dev.vars
+.wrangler/
+.DS_Store
+.idea/
+.vscode/
+.agents/local.json
+.agents/generated/
+.agent-state/
+.codex/
+.gemini/
+.claude/skills
+.cursor/
+.grok/

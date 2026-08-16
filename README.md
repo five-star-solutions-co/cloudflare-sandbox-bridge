@@ -4,26 +4,48 @@ Cloudflare Worker (TypeScript + [Hono](https://hono.dev/)) that exposes the sand
 
 ## Prerequisites
 
-- Node.js and npm
+- Bun >= 1.3.13
+- Node >= 24
 - A Cloudflare account with the Containers / Sandbox beta enabled
-- Wrangler is included as a dev dependency — `npm ci` is all you need
+
+## Commands
+
+```sh
+bun install
+bun run check
+bun run lint
+bun run format
+bun run format:check
+bun run hooks:install
+bun run hooks:validate
+bun run test
+```
+
+`lint` runs oxlint with type-aware linting and TypeScript diagnostics. `oxlint-tsgolint` is required for those checks. `format` runs `oxfmt --write .`. `format:check` runs `oxfmt --check .`. Markdown is ignored so docs can be edited without formatter churn.
+
+`check` runs `format:check` and `lint` concurrently, then tests. Lefthook pre-commit is validation-only (`oxfmt --check` and `oxlint --type-aware` on staged files). Pre-push runs `bun run check`.
 
 ## Getting Started
 
 ```sh
-npm ci
-cp .dev.vars.example .dev.vars
-# Edit .dev.vars and set SANDBOX_API_KEY (generate one with: openssl rand -hex 32)
-npm run dev
+bun install
+cp .env.example .env.development
+cp .env.example .env.production
+# Set a unique SANDBOX_API_KEY in each file (openssl rand -hex 32)
+bun run env:encrypt
+bun run hooks:install
+bun run dev
 ```
 
 The worker starts at `http://localhost:8787`.
+
+`bun install` decrypts `.env.development` / `.env.production` when the encrypted files and dotenvx keys are present.
 
 ### Development tools
 
 When running locally, a few routes make it easy to explore the API:
 
-- **`GET /v1/openapi.html`** — self-contained browser UI rendered from the OpenAPI spec. Open this in your browser to explore every endpoint interactively. Auth is skipped when `SANDBOX_API_KEY` is not set in `.dev.vars`.
+- **`GET /v1/openapi.html`** — self-contained browser UI rendered from the OpenAPI spec. Open this in your browser to explore every endpoint interactively. Auth is skipped when `SANDBOX_API_KEY` is not set in `.env.development`.
 - **`GET /v1/openapi.json`** — machine-readable OpenAPI 3.1 schema. Requires `Authorization: Bearer <token>` when the token is set.
 - **`GET /health`** — unauthenticated liveness probe; returns `{"ok": true}`.
 
@@ -34,29 +56,34 @@ token, Durable Object namespace, containers, capacity, and custom domain:
 
 | Environment | Worker | Domain |
 | --- | --- | --- |
-| Production | `cloudflare-sandbox-bridge` | `sandbox.5starsolutions.co` |
+| Production | `cloudflare-sandbox-bridge-production` | `sandbox.5starsolutions.co` |
 | Development | `cloudflare-sandbox-bridge-development` | `sandbox.fivestardev.co` |
 
 Keep `SANDBOX_API_KEY` different in each environment. Sharing one deployed Worker would let a development credential
 operate production sandbox IDs and would combine both environments under the same container limit and warm pool.
 
-GitHub Actions deploys development from pushes to `main`. Workflow dispatch can deploy development, production, or
-both. Configure the repository secret `CLOUDFLARE_API_TOKEN` before running it.
+GitHub Actions deploys development and production on every push to `main`. Workflow dispatch can still target one
+environment or both. Configure these repository secrets before running it:
+
+- `CLOUDFLARE_API_TOKEN`
+- `DOTENV_PRIVATE_KEY_DEVELOPMENT`
+- `DOTENV_PRIVATE_KEY_PRODUCTION`
+
+CI decrypts the selected env file, then `sync-env` writes Worker vars into `wrangler.jsonc` and uploads secrets.
 
 To deploy manually:
 
 ```sh
-npm ci
-npx wrangler login
+bun install
+bun run env:sync:production
 npx wrangler deploy --env production
-npx wrangler secret put SANDBOX_API_KEY --env production
 ```
 
 Configure and deploy development separately:
 
 ```sh
+bun run env:sync:development
 npx wrangler deploy --env development
-npx wrangler secret put SANDBOX_API_KEY --env development
 ```
 
 Verify the deployment:
@@ -75,14 +102,14 @@ memory, change its `instance_type` to `"standard-1"` (4 vCPU / 8 GiB RAM).
 
 The bridge worker depends on two versioned artifacts that should be kept in sync:
 
-1. **`@cloudflare/sandbox`** — the SDK package in `package.json`. Bump the version (or use `"*"` to track latest) and run `npm install`.
+1. **`@cloudflare/sandbox`** — the SDK package in `package.json`. Bump the version (or use `"*"` to track latest) and run `bun install`.
 2. **`cloudflare/sandbox` Docker image** — the base image tag in `Dockerfile` (e.g. `FROM docker.io/cloudflare/sandbox:0.12.4`). Update the tag to match the SDK version.
 
 Both versions should match — the SDK and container image are released together. After updating:
 
 ```sh
-npm install
-npm run dev          # verify locally
+bun install
+bun run dev          # verify locally
 npx wrangler deploy --env production  # deploy the update
 ```
 
@@ -94,11 +121,12 @@ All `/v1/sandbox/*` and `/v1/openapi.*` routes require:
 Authorization: Bearer <SANDBOX_API_KEY>
 ```
 
-If `SANDBOX_API_KEY` is not configured on the worker, auth is skipped — convenient for local dev without a `.dev.vars` file. Set the secret before deploying:
+If `SANDBOX_API_KEY` is not configured on the worker, auth is skipped — convenient for local dev with an empty key in `.env.development`. Set a unique key in each env file, encrypt, then sync:
 
 ```sh
-wrangler secret put SANDBOX_API_KEY --env development
-wrangler secret put SANDBOX_API_KEY --env production
+bun run env:encrypt
+bun run env:sync:development
+bun run env:sync:production
 ```
 
 ## Sandbox Interface

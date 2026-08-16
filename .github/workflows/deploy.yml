@@ -1,7 +1,7 @@
 name: Deploy Sandbox Bridge
 run-name: >-
   Deploy Sandbox Bridge · ${{ github.event_name == 'push'
-    && 'Development'
+    && 'Development + Production'
     || inputs.environment == 'development' && 'Development'
     || inputs.environment == 'production' && 'Production'
     || 'Development + Production' }}
@@ -31,14 +31,15 @@ jobs:
     name: Sandbox Bridge
     strategy:
       matrix:
-        environment: ${{ github.event_name == 'push' && fromJSON('["development"]') || inputs.environment == 'all' && fromJSON('["development","production"]') || fromJSON(format('["{0}"]', inputs.environment)) }}
+        environment: ${{ github.event_name == 'push' && fromJSON('["development","production"]') || inputs.environment == 'all' && fromJSON('["development","production"]') || fromJSON(format('["{0}"]', inputs.environment)) }}
       fail-fast: false
     uses: Utilities-Studio/infra/.github/workflows/cloudflare-deploy.yml@main
     with:
       concurrency_key: sandbox-bridge-${{ matrix.environment }}
       environment: ${{ matrix.environment }}
-      pre_deploy_commands: bun run typecheck && bun run test
+      pre_deploy_commands: bun run check
       skip_build: true
-      skip_sync_env: true
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+      DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
