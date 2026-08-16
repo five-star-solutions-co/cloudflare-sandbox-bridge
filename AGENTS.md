@@ -19,7 +19,9 @@ Cloudflare Worker that exposes the sandbox HTTP API. Repository rules add toolin
 
 ## Deploy
 
-Pushes to `main` deploy development and production. That is the intended policy for this repo. Do not change the workflow back to development-only on push.
+Pushes to `main` publish the sandbox image once, then deploy development and production. That is the intended policy for this repo. Do not change the workflow back to development-only on push.
+
+Named environments use the Cloudflare registry image. Top-level `containers[].image` stays `./Dockerfile` for local `wrangler dev`. Agents never run `wrangler containers push`.
 
 ## Banned commands
 

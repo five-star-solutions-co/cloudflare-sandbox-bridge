@@ -38,7 +38,7 @@
 			"containers": [
 				{
 					"class_name": "Sandbox",
-					"image": "./Dockerfile",
+					"image": "registry.cloudflare.com/376760229d2c711cee874b9285685496/cloudflare-sandbox-bridge:latest",
 					"instance_type": "lite",
 					"max_instances": 3
 				}
@@ -59,7 +59,7 @@
 			"containers": [
 				{
 					"class_name": "Sandbox",
-					"image": "./Dockerfile",
+					"image": "registry.cloudflare.com/376760229d2c711cee874b9285685496/cloudflare-sandbox-bridge:latest",
 					"instance_type": "lite",
 					"max_instances": 10
 				}
