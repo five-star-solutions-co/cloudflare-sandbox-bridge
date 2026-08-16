@@ -69,9 +69,9 @@ environment or both. Configure these repository secrets before running it:
 - `DOTENV_PRIVATE_KEY_DEVELOPMENT`
 - `DOTENV_PRIVATE_KEY_PRODUCTION`
 
-CI publishes the sandbox container image once to the Cloudflare registry, then deploys both
-Workers against `registry.cloudflare.com/<account>/cloudflare-sandbox-bridge:latest`. Local
-`wrangler dev` still builds `./Dockerfile`.
+CI publishes the sandbox container image once as `sha-<7>` (Cloudflare rejects `:latest`),
+rewrites `wrangler.jsonc` to that tag, then deploys both Workers. Local `wrangler dev` still
+builds `./Dockerfile`.
 
 CI decrypts the selected env file, then `sync-env` writes Worker vars into `wrangler.jsonc` and uploads secrets.
 
